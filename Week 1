@@ -75,32 +75,14 @@ Constraints:
 Code:
 class Solution:
     def videoStitching(self, clips: List[List[int]], time: int) -> int:
-        """
-        for all cases we have:
-            s0 <= s1 <= s2
-        The two dismissing senarios: 
-        1) current end (e1) is smaller than prev_end (e0), then we dismiss current
-        s0            e0
-         s1         e1      just dismiss it 
-        
-        2) current start (s2) is smaller than prev_prev_end (e0), then we dismiss previous
-            s0         e0
-                s1       e1
-                s2              e2    add current (update prev_end) and dismiss previous (no cnt+=1)
-            
-        """
         prev_prev_end, prev_end, cnt = -1, 0, 0
         for start, end in sorted(clips):
-            # done              or missing a clip
             if prev_end >= time or start > prev_end: break
-            # redundant
             if end <= prev_end: continue
 
             if start <= prev_prev_end:
-                # if s2 < e0: only update the prev_end but keep prev_prev_end
                 prev_end = end
             else:
-                # 
                 cnt += 1
                 prev_prev_end, prev_end = prev_end, end
 
