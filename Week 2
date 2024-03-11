@@ -1,0 +1,209 @@
+Q.1. String to Integer (atoi)
+Implement the myAtoi(string s) function, which converts a string to a 32-bit signed integer (similar to C/C++'s atoi function).
+
+The algorithm for myAtoi(string s) is as follows:
+
+Read in and ignore any leading whitespace.
+Check if the next character (if not already at the end of the string) is '-' or '+'. Read this character in if it is either. This determines if the final result is negative or positive respectively. Assume the result is positive if neither is present.
+Read in next the characters until the next non-digit character or the end of the input is reached. The rest of the string is ignored.
+Convert these digits into an integer (i.e. "123" -> 123, "0032" -> 32). If no digits were read, then the integer is 0. Change the sign as necessary (from step 2).
+If the integer is out of the 32-bit signed integer range [-231, 231 - 1], then clamp the integer so that it remains in the range. Specifically, integers less than -231 should be clamped to -231, and integers greater than 231 - 1 should be clamped to 231 - 1.
+Return the integer as the final result.
+Note:
+
+Only the space character ' ' is considered a whitespace character.
+Do not ignore any characters other than the leading whitespace or the rest of the string after the digits.
+ 
+
+Example 1:
+
+Input: s = "42"
+Output: 42
+Explanation: The underlined characters are what is read in, the caret is the current reader position.
+Step 1: "42" (no characters read because there is no leading whitespace)
+         ^
+Step 2: "42" (no characters read because there is neither a '-' nor '+')
+         ^
+Step 3: "42" ("42" is read in)
+           ^
+The parsed integer is 42.
+Since 42 is in the range [-231, 231 - 1], the final result is 42.
+Example 2:
+
+Input: s = "   -42"
+Output: -42
+Explanation:
+Step 1: "   -42" (leading whitespace is read and ignored)
+            ^
+Step 2: "   -42" ('-' is read, so the result should be negative)
+             ^
+Step 3: "   -42" ("42" is read in)
+               ^
+The parsed integer is -42.
+Since -42 is in the range [-231, 231 - 1], the final result is -42.
+Example 3:
+
+Input: s = "4193 with words"
+Output: 4193
+Explanation:
+Step 1: "4193 with words" (no characters read because there is no leading whitespace)
+         ^
+Step 2: "4193 with words" (no characters read because there is neither a '-' nor '+')
+         ^
+Step 3: "4193 with words" ("4193" is read in; reading stops because the next character is a non-digit)
+             ^
+The parsed integer is 4193.
+Since 4193 is in the range [-231, 231 - 1], the final result is 4193.
+ 
+
+Constraints:
+
+0 <= s.length <= 200
+s consists of English letters (lower-case and upper-case), digits (0-9), ' ', '+', '-', and '.'.
+
+Code:
+class Solution:
+    def myAtoi(self, str: str) -> int:
+        value, state, pos, sign = 0, 0, 0, 1
+
+        if len(str) == 0:
+            return 0
+
+        while pos < len(str):
+            current_char = str[pos]
+            if state == 0:
+                if current_char == " ":
+                    state = 0
+                elif current_char == "+" or current_char == "-":
+                    state = 1
+                    sign = 1 if current_char == "+" else -1
+                elif current_char.isdigit():
+                    state = 2
+                    value = value * 10 + int(current_char)
+                else:
+                    return 0
+            elif state == 1:
+                if current_char.isdigit():
+                    state = 2
+                    value = value * 10 + int(current_char)
+                else:
+                    return 0
+            elif state == 2:
+                if current_char.isdigit():
+                    state = 2
+                    value = value * 10 + int(current_char)
+                else:
+                    break
+            else:
+                return 0
+            pos += 1
+
+        value = sign * value
+        value = min(value, 2 ** 31 - 1)
+        value = max(-(2 ** 31), value)
+
+        return value
+
+
+
+Q.2. Longest Repeating Character Replacement
+You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
+
+Return the length of the longest substring containing the same letter you can get after performing the above operations.
+
+Example 1:
+
+Input: s = "ABAB", k = 2
+Output: 4
+Explanation: Replace the two 'A's with two 'B's or vice versa.
+Example 2:
+
+Input: s = "AABABBA", k = 1
+Output: 4
+Explanation: Replace the one 'A' in the middle with 'B' and form "AABBBBA".
+The substring "BBBB" has the longest repeating letters, which is 4.
+There may exists other ways to achieve this answer too.
+
+Constraints:
+
+1 <= s.length <= 105
+s consists of only uppercase English letters.
+0 <= k <= s.length
+
+Code:
+class Solution:
+        def characterReplacement(self, s: str, k: int) -> int:
+            l = 0
+            c_frequency = {}
+            longest_str_len = 0
+            for r in range(len(s)):
+            
+                if not s[r] in c_frequency:
+                    c_frequency[s[r]] = 0
+                c_frequency[s[r]] += 1
+            
+            # Replacements cost = cells count between left and right - highest frequency
+                cells_count = r - l + 1
+                if cells_count - max(c_frequency.values()) <= k:
+                    longest_str_len = max(longest_str_len, cells_count)
+                
+                else:
+                    c_frequency[s[l]] -= 1
+                    if not c_frequency[s[l]]:
+                        c_frequency.pop(s[l])
+                    l += 1
+
+            return longest_str_len
+
+
+Q. 3. Palindrome Pairs
+
+You are given a 0-indexed array of unique strings words. A palindrome pair is a pair of integers (i, j) such that:
+0 <= i, j < words.length, i != j, and words[i] + words[j] (the concatenation of the two strings) is a palindrome. Return an array of all the palindrome pairs of words. You must write an algorithm with O(sum of words[i].length) runtime complexity.
+
+Example 1:
+
+Input: words = ["abcd","dcba","lls","s","sssll"]
+Output: [[0,1],[1,0],[3,2],[2,4]]
+Explanation: The palindromes are ["abcddcba","dcbaabcd","slls","llssssll"]
+Example 2:
+
+Input: words = ["bat","tab","cat"]
+Output: [[0,1],[1,0]]
+Explanation: The palindromes are ["battab","tabbat"]
+Example 3:
+
+Input: words = ["a",""]
+Output: [[0,1],[1,0]]
+Explanation: The palindromes are ["a","a"]
+ 
+
+Constraints:
+
+1 <= words.length <= 5000
+0 <= words[i].length <= 300
+words[i] consists of lowercase English letters.
+
+Code:
+class Solution:
+    def palindromePairs(self, words: List[str]) -> List[List[int]]:
+        backward, res = {}, []
+        for i, word in enumerate(words):
+            backward[word[::-1]] = i
+
+        for i, word in enumerate(words):
+            
+            if word in backward and backward[word] != i:
+                res.append([i, backward[word]])
+                
+            if word != "" and "" in backward and word == word[::-1]:
+                res.append([i, backward[""]])
+                res.append([backward[""], i])
+                
+            for j in range(len(word)):
+                if word[j:] in backward and word[:j] == word[j-1::-1]:
+                    res.append([backward[word[j:]], i])
+                if word[:j] in backward and word[j:] == word[:j-1:-1]:
+                    res.append([i, backward[word[:j]]])
+                    
+        return res
