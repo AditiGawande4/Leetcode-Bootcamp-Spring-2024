@@ -1,0 +1,47 @@
+1. Lowest Common Ancestor of a Binary Tree
+class Solution:
+  def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    if not root or root == p or root == q:
+      return root
+
+    l = self.lowestCommonAncestor(root.left, p, q)
+    r = self.lowestCommonAncestor(root.right, p, q)
+
+    if l and r:
+      return root
+    return l or r
+
+2. Word Break
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        
+        def construct(current,wordDict, memo={}):
+            if current in memo:
+                return memo[current]
+
+            if not current:
+                return True
+
+            for word in wordDict:
+                if current.startswith(word):
+                    new_current = current[len(word):]
+                    if construct(new_current,wordDict,memo):
+                        memo[current] = True
+                        return True
+
+            memo[current] = False
+            return False
+
+        return construct(s,wordDict)
+3. Kth Largest Element in an Array
+class Solution:
+    def findKthLargest(self, nums: List[int], k: int) -> int:
+        heap = nums[:k]
+        heapq.heapify(heap)
+        
+        for num in nums[k:]:
+            if num > heap[0]:
+                heapq.heappop(heap)
+                heapq.heappush(heap, num)
+        
+        return heap[0]
